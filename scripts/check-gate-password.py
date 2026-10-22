@@ -19,7 +19,7 @@ import pathlib
 import re
 import sys
 
-SITE = pathlib.Path.home() / "Desktop/Hermes/Church Site/site"
+SITE = pathlib.Path.home() / "Desktop/Hermes/Church Site/docs"
 SECRET = pathlib.Path.home() / ".hermes/secrets/church-gate.txt"
 PAYLOAD_RE = re.compile(r'id="cn-payload"[^>]*>(.*?)</script>', re.S)
 
