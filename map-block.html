@@ -1,0 +1,282 @@
+<section class="mapsection">
+  <div class="sec-head"><div class="left"><span class="bar"></span><h2>The Bible Lands</h2></div><div class="bm-controls"><button class="bm-toggle" data-era="all">All eras</button><button class="bm-toggle" data-era="ot">Old Testament</button><button class="bm-toggle" data-era="nt">New Testament</button></div></div>
+  <div class="biblemap">
+    <div class="bm-vp" id="bm-vp">
+      <div id="bm-tiles"></div>
+      <svg class="bm-vec" id="bm-vec"></svg>
+      <div class="bm-markers" id="bm-markers"></div>
+      <div class="bm-ctrl">
+        <button id="bm-zoomin" title="Zoom in">+</button>
+        <button id="bm-zoomout" title="Zoom out">−</button>
+        <button id="bm-reset" title="Reset view">⟳</button>
+        <div class="bm-zoom" id="bm-zoom"></div>
+      </div>
+      <div class="bm-attrib">Imagery © Esri World Imagery</div>
+      <div class="bm-legend bm-legend-title"><span class="bm-lg-head">Legend</span><span><i class="ot"></i>Old Testament</span><span><i class="nt"></i>New Testament</span><span><i class="star"></i>Jerusalem</span></div>
+    </div>
+    <div class="bm-tip" id="bm-tip"></div>
+    <div class="bm-hint">Drag to pan · scroll / pinch to zoom · double-click to zoom in · hover a marker for a note</div>
+  </div>
+</section>
+<style>
+.mapsection{margin:26px 0}.mapsection .map-body{display:block}
+.mapsection .sec-head .bar{background:linear-gradient(90deg,var(--sc-a,var(--ruby)),var(--sc-b,var(--amber)))}
+.biblemap{position:relative;background:#0e1116;border:1px solid #373442;border-radius:16px;overflow:hidden}
+.bm-vp{position:relative;width:100%;height:500px;overflow:hidden;cursor:grab;touch-action:none;background:#0e1116}
+.map-focus .bm-vp{height:430px}
+.bm-vp:active{cursor:grabbing}
+.tile{position:absolute;will-change:transform;pointer-events:none;user-select:none}
+.bm-vec{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.bm-vec text.vtext{font-family:'Cormorant Garamond',serif;font-size:26px;letter-spacing:2px;
+  stroke:#19181E;stroke-width:5;stroke-linejoin:round;paint-order:stroke}
+.bm-vec text.it{font-style:italic}
+.bm-markers{position:absolute;top:0;left:0;width:0;height:0}
+.marker{position:absolute;transform:translate(-50%,-50%);cursor:pointer;will-change:transform}
+.marker .dot{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;
+  background:#C89B3C;border:2.5px solid #19181E;box-shadow:0 0 0 1px rgba(26,26,26,.4)}
+.marker.nt .dot{background:#2EC4B6}
+.marker.both .dot{background:conic-gradient(#C89B3C 0turn 0.5turn, #2EC4B6 0.5turn 1turn);
+  outline:1.5px solid rgba(255,255,255,.22);outline-offset:-1px}
+.marker.star .dot{background:#9A2A3E;box-shadow:0 0 0 2px #F2C879,0 0 14px 2px rgba(242,200,121,.5)}
+.marker.focus .dot{background:#F2C879;box-shadow:0 0 0 2px rgba(242,200,121,.4),0 0 12px rgba(242,200,121,.55)}
+.marker .lbl{position:absolute;white-space:nowrap;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+  color:#F1EDE3;text-shadow:0 1px 2px #000,0 0 4px #000,0 0 8px rgba(0,0,0,.8)}
+.marker .lbl.r{left:14px;top:-9px}.marker .lbl.l{right:14px;top:-9px}
+.marker:hover .dot{box-shadow:0 0 0 2px #F2C879}
+.bm-tip{display:none;position:absolute;left:0;top:0;pointer-events:none;max-width:248px;z-index:6;
+  background:#2C2A35;border:1px solid #C89B3C;border-left:3px solid #C89B3C;border-radius:10px;
+  padding:9px 12px;font-size:12.5px;line-height:1.5;color:#E6E1D6;box-shadow:0 10px 30px rgba(0,0,0,.55)}
+.bm-tip b{display:block;font-family:'Cormorant Garamond',serif;font-size:16px;color:#F2C879;margin-bottom:2px}
+.bm-attrib{position:absolute;right:8px;bottom:6px;font-size:10px;color:#cfd4da;background:rgba(10,12,16,.55);
+  padding:2px 7px;border-radius:6px;pointer-events:none;z-index:4;letter-spacing:.02em}
+.bm-legend{position:absolute;left:10px;bottom:6px;display:flex;gap:14px;align-items:center;z-index:4;
+  background:rgba(10,12,16,.78);border:1px solid #3A3744;border-radius:9px;padding:6px 12px;
+  font-size:11px;color:#D6DAE0;pointer-events:none;letter-spacing:.02em;flex-wrap:wrap}
+.bm-legend-title{flex-direction:column;align-items:flex-start;gap:5px;padding:9px 13px;min-width:150px}
+.bm-lg-head{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#F2C879;font-weight:600;border-bottom:1px solid #3A3744;padding-bottom:4px;width:100%}
+.bm-legend-title>span:not(.bm-lg-head){display:flex;align-items:center;gap:6px}
+.bm-legend-title i{margin-right:0}
+.bm-legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1.5px solid #19181E}
+.bm-legend i.ot{background:#C89B3C}.bm-legend i.nt{background:#2EC4B6}
+.bm-legend i.star{background:#9A2A3E;box-shadow:0 0 0 2px #F2C879}
+.bm-legend i.foc{background:#F2C879;box-shadow:0 0 0 2px rgba(242,200,121,.35)}
+.bm-legend i.swr{width:18px;height:0;border-top:2px dashed #C89B3C;margin-right:6px;vertical-align:middle;display:inline-block;border-radius:0}
+.bm-ctrl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.bm-ctrl button{width:32px;height:32px;border-radius:9px;background:#211F28;border:1px solid #46424F;
+  color:#F1EDE3;font-size:17px;line-height:1;cursor:pointer;font-family:'Inter',sans-serif}
+.bm-ctrl button:hover{background:#2C2A35;border-color:#6A55B5}
+.bm-zoom{font-size:10.5px;text-align:center;color:#A7A09A;padding-top:2px}
+.bm-hint{text-align:center;color:#7A746E;font-size:11.5px;padding:8px 10px 10px;border-top:1px solid #373442}
+.bm-controls{display:flex;gap:6px}
+.bm-toggle{background:#2C2A35;border:1px solid #46424F;color:#A7A09A;border-radius:999px;
+  padding:6px 14px;font-size:12.5px;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif}
+.bm-toggle:hover{color:#F1EDE3;border-color:#6A55B5}
+.bm-toggle.active{background:#4C3A8A;border-color:#6A55B5;color:#F1EDE3}
+@media(max-width:640px){.bm-controls{flex-wrap:wrap}.bm-vp{height:380px}.map-focus .bm-vp{height:360px}}
+</style>
+<script>
+(function(){
+  var D = {"cities": [["Jerusalem", "both", 31.778, 35.235, "Capital of Judah; site of the Temple; centre of Jesus' ministry, crucifixion and resurrection.", "r"], ["Jericho", "both", 31.857, 35.444, "First city conquered at the entry into Canaan (Josh 6); scene of Jesus' healing of Bartimaeus (Mark 10).", "r"], ["Bethlehem", "both", 31.705, 35.203, "Birthplace of David and of Jesus (Micah 5:2; Luke 2).", "l"], ["Hebron", "both", 31.532, 35.099, "Where Abraham sojourned and David was first anointed king (Gen 13; 2 Sam 2).", "l"], ["Joppa", "both", 32.053, 34.751, "Port (Jonah sailed from here); where Peter received the vision (Acts 10).", "l"], ["Tyre", "both", 33.272, 35.212, "Phoenician seaport that supplied timber for the Temple (1 Kgs 5); Jesus visited its region (Mark 7).", "l"], ["Sidon", "both", 33.562, 35.388, "Ancient Phoenician city; mentioned in the prophets and in Acts 27.", "r"], ["Damascus", "both", 33.513, 36.292, "Aramaean capital east of Israel; on the road where Paul was converted (Acts 9).", "r"], ["Mt Sinai", "ot", 28.539, 33.973, "Where Israel received the Law, via Moses (Exodus 19-20).", "r"], ["Kadesh Barnea", "ot", 30.653, 34.42, "Israel's camp on the edge of the wilderness; the spy mission and rebellion (Num 13-14).", "r"], ["Gaza", "ot", 31.506, 34.49, "One of the five Philistine cities (Judg 16; Acts 8).", "l"], ["Beersheba", "ot", 31.251, 34.791, "\"Well of the oath\" — southern limit of the land (Gen 21).", "l"], ["Lachish", "ot", 31.565, 34.848, "Fortified Judahite city; its letters tell of the Babylonian siege (2 Kgs 18).", "l"], ["Shiloh", "ot", 32.057, 35.289, "Where the tabernacle and Ark rested in the days of the judges (1 Sam 1-4).", "r"], ["Bethel", "ot", 31.93, 35.22, "Where Jacob dreamed of the ladder (Gen 28); later a rival sanctuary (1 Kgs 12).", "l"], ["Shechem", "ot", 32.214, 35.253, "Between mountains Ebal and Gerizim; the covenant renewed (Josh 8, 24).", "l"], ["Samaria", "ot", 32.277, 35.19, "Capital of the northern kingdom of Israel (1 Kgs 16).", "l"], ["Rabbah", "ot", 31.954, 35.935, "Capital of the Ammonites — \"Rabbah of the Ammonites\" (2 Sam 11).", "r"], ["Megiddo", "ot", 32.584, 35.182, "Stronghold over the Jezreel valley; the name became \"Armageddon\" (Rev 16:16).", "l"], ["Capernaum", "nt", 32.88, 35.575, "Jesus' Galilean base and adopted town (Matt 4:13); synagogue and healings.", "r"], ["Bethsaida", "nt", 32.81, 35.618, "Home of Peter, Andrew and Philip; feeding of the five thousand nearby (Luke 9).", "r"], ["Chorazin", "nt", 32.904, 35.561, "Town rebuked by Jesus for unbelief (Matt 11:21).", "l"], ["Cana", "nt", 32.747, 35.339, "Site of Jesus' first sign — water into wine (John 2).", "l"], ["Nazareth", "nt", 32.703, 35.297, "Jesus' hometown where he grew up and first preached (Luke 4).", "l"], ["Nain", "nt", 32.632, 35.349, "Where Jesus raised the widow's son (Luke 7:11-17).", "r"], ["Sychar", "nt", 32.211, 35.29, "Samaritan town of Jacob's well where Jesus met the woman (John 4).", "r"], ["Caesarea", "nt", 32.502, 34.903, "Roman port and seat of government; Paul imprisoned here (Acts 23-26).", "l"], ["Emmaus", "nt", 31.839, 34.988, "Village where the risen Jesus walked with two disciples (Luke 24).", "l"], ["Bethany", "nt", 31.771, 35.264, "Home of Mary, Martha and Lazarus; the tomb and resurrection of Lazarus (John 11).", "r"]], "exodus": [[30.62, 31.9], [30.38, 32.28], [29.95, 32.55], [29.6, 32.75], [29.7, 33.3], [28.54, 33.97], [29.85, 34.05], [30.65, 34.42], [30.85, 35.3], [31.4, 35.75], [31.7, 35.6], [31.86, 35.44]], "nt_path": [[32.7, 35.3], [32.5, 35.28], [32.28, 35.19], [32.1, 35.3], [31.86, 35.44], [31.84, 35.32], [31.78, 35.27], [31.778, 35.235]], "jordan": [[32.82, 35.59], [32.6, 35.56], [32.4, 35.56], [32.2, 35.57], [32.0, 35.57], [31.8, 35.55], [31.6, 35.5], [31.5, 35.46]], "regions": [["M E D I T E R R A N E A N  S E A", 32.45, 32.1, -24, "#8FB8C4"], ["Egypt & Goshen", 30.75, 31.95, 0, "#E6C98F"], ["Sinai", 29.35, 33.95, 0, "#CDB98F"], ["Negev", 30.65, 34.75, 0, "#CDB98F"], ["Philistia", 31.62, 34.55, 0, "#E6B7A6"], ["Judah", 31.4, 35.05, 0, "#C9B8E6"], ["Israel / Samaria", 32.18, 35.08, 0, "#C9B8E6"], ["Galilee", 32.9, 35.33, 0, "#A6D9A0"], ["Ammon", 32.02, 35.98, 0, "#C9B8E6"], ["Moab", 31.45, 35.9, 0, "#C9B8E6"], ["Edom", 30.55, 35.6, 0, "#C9B8E6"], ["Syria", 33.25, 36.1, 0, "#C9B8E6"]], "galilee": {"lat": 32.82, "lon": 35.4, "rx": 0.17, "ry": 0.13}, "boundary": [[[31.99, 34.8], [31.86, 35.3]]], "waters": [[32.805, 35.545, 0.085, 0.075, "Sea of Galilee"], [31.46, 35.39, 0.38, 0.04, "Dead Sea"]], "zones": [], "routes": [], "route_label": "EXODUS ROUTE", "tiles": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", "init": {"lon": 35.35, "lat": 31.45, "z": 9.2}};
+  var vp=document.getElementById('bm-vp');
+  var tips=document.getElementById('bm-tiles');
+  var vecs=document.getElementById('bm-vec');
+  var marks=document.getElementById('bm-markers');
+  var tip=document.getElementById('bm-tip');
+  if(!vp||!tips||!vecs||!marks||!tip) return;
+
+  function merc(lat){ var r=lat*Math.PI/180; return 0.5-Math.asinh(Math.tan(r))/(2*Math.PI); }
+  function mercInv(yf){ return Math.atan(Math.sinh(Math.PI*(1-2*yf)))*180/Math.PI; }
+  function camPx(){ var ww=256*Math.pow(2,cam.z); return {x:(cam.lon+180)/360*ww, y:merc(cam.lat)*ww, ww:ww}; }
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  var cam = {lon: D.init.lon, lat: D.init.lat, z: D.init.z};
+  var MINZ=4, MAXZ=17, vpW, vpH;
+
+  function resize(){ vpW=vp.clientWidth; vpH=vp.clientHeight; render(); }
+  window.addEventListener('resize', resize);
+
+  function sx(lon){ var p=camPx(); return (lon+180)/360*p.ww - p.x + vpW/2; }
+  function sy(lat){ var p=camPx(); return merc(lat)*p.ww - p.y + vpH/2; }
+
+  var tileCache={}; var curTZ=-1;
+  function renderTiles(){
+    var zt=Math.floor(cam.z), scale=Math.pow(2,cam.z-zt);
+    var ww=256*Math.pow(2,zt);
+    var tcx=((cam.lon+180)/360)*ww, tcy=merc(cam.lat)*ww;
+    var vpx0=tcx - vpW/2/scale, vpx1=tcx + vpW/2/scale;
+    var vpy0=tcy - vpH/2/scale, vpy1=tcy + vpH/2/scale;
+    var x0=Math.max(0,Math.floor(vpx0/256)-1), x1=Math.min(Math.pow(2,zt)-1,Math.floor(vpx1/256)+1);
+    var y0=Math.max(0,Math.floor(vpy0/256)-1), y1=Math.min(Math.pow(2,zt)-1,Math.floor(vpy1/256)+1);
+    if(zt!==curTZ){ for(var k in tileCache){ tileCache[k].parentNode.removeChild(tileCache[k]); } tileCache={}; curTZ=zt; }
+    var wanted={};
+    for(var y=y0;y<=y1;y++) for(var x=x0;x<=x1;x++){
+      var key=zt+':'+x+':'+y; wanted[key]=1;
+      var im=tileCache[key];
+      if(!im){ im=new Image(); im.className='tile';
+        im.src=D.tiles.replace('{z}',zt).replace('{y}',y).replace('{x}',x);
+        tips.appendChild(im); tileCache[key]=im; }
+      im.style.left=((x*256-tcx)*scale+vpW/2)+'px';
+      im.style.top =((y*256-tcy)*scale+vpH/2)+'px';
+      im.style.width=(256*scale)+'px'; im.style.height=(256*scale)+'px';
+    }
+    for(var k in tileCache){ if(!wanted[k]){ tileCache[k].parentNode.removeChild(tileCache[k]); delete tileCache[k]; } }
+  }
+  tips.style.width='0px'; tips.style.height='0px';
+
+  function poly(pts){ return pts.map(function(p){ return sx(p[1]).toFixed(1)+','+sy(p[0]).toFixed(1); }).join(' '); }
+  function renderVectors(){
+    var H=[];
+    if(D.exodus&&D.exodus.length){
+      H.push('<g class="bm-layer" data-era="ot">');
+      H.push('<path d="M'+poly(D.exodus)+'" fill="none" stroke="#C89B3C" stroke-width="5" stroke-dasharray="16 14" stroke-linecap="round" opacity="0.95"/>');
+      var ex=D.exodus[D.exodus.length-1];
+      H.push('<circle cx="'+sx(ex[1]).toFixed(1)+'" cy="'+sy(ex[0]).toFixed(1)+'" r="8" fill="#C89B3C"/>');
+      H.push('<text class="vtext" x="'+sx(30.3).toFixed(1)+'" y="'+sy(34.5).toFixed(1)+'" fill="#C89B3C">'+(D.route_label||'EXODUS ROUTE')+'</text>');
+      H.push('</g>');
+    }
+    if(D.boundary&&D.boundary.length){
+      H.push('<g class="bm-layer" data-era="ot">');
+      D.boundary.forEach(function(seg){ H.push('<path d="M'+poly(seg)+'" fill="none" stroke="#6A55B5" stroke-width="4" stroke-dasharray="9 10" opacity="0.9"/>'); });
+      H.push('</g>');
+    }
+    if(D.nt_path&&D.nt_path.length){
+      H.push('<g class="bm-layer" data-era="nt">');
+      var g=D.galilee;
+      if(g) H.push('<ellipse cx="'+sx(g.lon).toFixed(1)+'" cy="'+sy(g.lat).toFixed(1)+'" rx="'+Math.abs(sx(g.lon-g.rx)-sx(g.lon+g.rx))/2+'" ry="'+Math.abs(sy(g.lat+g.ry)-sy(g.lat-g.ry))/2+'" fill="#5F7A55" opacity="0.16"/>');
+      H.push('<path d="M'+poly(D.nt_path)+'" fill="none" stroke="#F2C879" stroke-width="4" stroke-dasharray="13 12" stroke-linecap="round" opacity="0.95"/>');
+      H.push('<text class="vtext" x="'+sx(32.60).toFixed(1)+'" y="'+sy(35.08).toFixed(1)+'" fill="#F2C879">TO JERUSALEM</text>');
+      H.push('</g>');
+    }
+    (D.regions||[]).forEach(function(x){
+      var ang=x[3]?' transform="rotate('+x[3]+' '+sx(x[2]).toFixed(1)+' '+sy(x[1]).toFixed(1)+')"':'';
+      H.push('<text class="vtext it" x="'+sx(x[2]).toFixed(1)+'" y="'+sy(x[1]).toFixed(1)+'" fill="'+x[4]+'"'+ang+'>'+x[0]+'</text>');
+    });
+    (D.waters||[]).forEach(function(w){
+      H.push('<ellipse cx="'+sx(w[1]).toFixed(1)+'" cy="'+sy(w[0]).toFixed(1)+'" rx="'+Math.abs(sx(w[1]+w[2])-sx(w[1]-w[2]))/2+'" ry="'+Math.abs(sy(w[0]+w[3])-sy(w[0]-w[3]))/2+'" fill="none" stroke="#9ED4E0" stroke-width="2.5" stroke-dasharray="8 8" opacity="0.85"/>');
+      H.push('<text class="vtext it" x="'+sx(w[1]).toFixed(1)+'" y="'+sy(w[0]).toFixed(1)+'" fill="#9ED4E0" text-anchor="middle">'+w[4]+'</text>');
+    });
+    if(D.jordan&&D.jordan.length)
+      H.push('<path d="M'+poly(D.jordan)+'" fill="none" stroke="#9ED4E0" stroke-width="4" stroke-dasharray="10 9" opacity="0.9"/>');
+    (D.zones||[]).forEach(function(z){
+      H.push('<ellipse cx="'+sx(z.lon).toFixed(1)+'" cy="'+sy(z.lat).toFixed(1)+'" rx="'+Math.abs(sx(z.lon-z.rx)-sx(z.lon+z.rx))/2+'" ry="'+Math.abs(sy(z.lat+z.ry)-sy(z.lat-z.ry))/2+'" fill="#C89B3C" opacity="0.10" stroke="#C89B3C" stroke-opacity="0.4" stroke-dasharray="6 6"/>');
+      if(z.label) H.push('<text class="vtext it" x="'+sx(z.lon).toFixed(1)+'" y="'+sy(z.lat).toFixed(1)+'" fill="#F2C879" text-anchor="middle">'+z.label+'</text>');
+    });
+    (D.routes||[]).forEach(function(r){
+      var c=r.color||'#C89B3C';
+      H.push('<path d="M'+poly(r.pts)+'" fill="none" stroke="'+c+'" stroke-width="4" stroke-dasharray="11 10" stroke-linecap="round" opacity="0.9"/>');
+      if(r.label&&r.label_pt) H.push('<text class="vtext" x="'+sx(r.label_pt[1]).toFixed(1)+'" y="'+sy(r.label_pt[0]).toFixed(1)+'" fill="'+c+'">'+r.label+'</text>');
+    });
+    vecs.innerHTML=H.join('');
+  }
+
+  var cities=[];
+  function buildMarkers(){
+    marks.innerHTML='';
+    D.cities.forEach(function(c){
+      var m=document.createElement('div');
+      var cls = c[1]==='ot'?' ot':(c[1]==='nt'?' nt':(c[1]==='both'?' both':' focus'));
+      m.className='marker'+cls;
+      m.setAttribute('data-era',c[1]||'all');
+      m.setAttribute('data-name',c[0]);
+      m.setAttribute('data-note',c[4]);
+      var dot=document.createElement('i'); dot.className='dot';
+      if(c[0]==='Jerusalem'&&c[1]==='both') dot.className='dot star';
+      var lbl=document.createElement('span'); lbl.className='lbl'+(c[5]||'r');
+      lbl.textContent=c[0];
+      m.appendChild(dot); m.appendChild(lbl); m.__c=c;
+      marks.appendChild(m); cities.push(m);
+      m.addEventListener('mouseenter',function(e){showTip(e,this)});
+      m.addEventListener('mousemove',function(e){moveTip(e)});
+      m.addEventListener('mouseleave',function(){tip.style.display='none'});
+    });
+    renderMarkers();
+  }
+  function renderMarkers(){
+    for(var i=0;i<cities.length;i++){ var m=cities[i], c=m.__c;
+      m.style.left=sx(c[3]).toFixed(1)+'px'; m.style.top=sy(c[2]).toFixed(1)+'px';
+    }
+  }
+  function showTip(e,m){
+    // SAFE: data-name/note are static attributes generated from a hard-coded list.
+    tip.innerHTML='<b>'+m.getAttribute('data-name')+'</b>'+m.getAttribute('data-note');
+    tip.style.display='block'; moveTip(e);
+  }
+  function moveTip(e){
+    var r=vp.getBoundingClientRect(), t=tip.getBoundingClientRect();
+    var x=e.clientX-r.left+16, y=e.clientY-r.top-10;
+    if(x+t.width>vpW-8) x=e.clientX-r.left-t.width-16;
+    if(y+t.height>vpH-8) y=e.clientY-r.top-t.height+16;
+    tip.style.left=Math.max(6,x)+'px'; tip.style.top=Math.max(6,y)+'px';
+  }
+
+  function apply(era){
+    if(!document.querySelectorAll('.bm-toggle').length) return;
+    document.querySelectorAll('.bm-toggle').forEach(function(b){ b.classList.toggle('active',b.getAttribute('data-era')===era); });
+    cities.forEach(function(m){ m.style.display=era==='all'||m.getAttribute('data-era')===era?'':'none'; });
+    vecs.querySelectorAll('.bm-layer').forEach(function(g){ g.style.display=era==='all'||g.getAttribute('data-era')===era?'':'none'; });
+  }
+  document.querySelectorAll('.bm-toggle').forEach(function(b){
+    b.addEventListener('click',function(){ apply(this.getAttribute('data-era')); });
+  });
+
+  function pan(dx,dy){ var p=camPx(); p.x+=dx; p.y+=dy;
+    cam.lon=p.x/p.ww*360-180; cam.lat=mercInv(p.y/p.ww); render(); }
+  function zoomAt(mx,my,f){
+    var p=camPx();
+    var lon0=(p.x+(mx-vpW/2))/p.ww*360-180;
+    var lat0=mercInv((p.y+(my-vpH/2))/p.ww);
+    var z2=clamp(cam.z+Math.log2(f),MINZ,MAXZ);
+    var q=256*Math.pow(2,z2);
+    cam.z=z2; cam.lon=lon0+(vpW/2-mx)/q*360; cam.lat=mercInv(merc(lat0)+(vpH/2-my)/q);
+    render();
+  }
+  var drag=null, pd=null;
+  function render(){
+    if(!vpW) return;
+    renderTiles(); renderVectors(); renderMarkers();
+    var zde=document.getElementById('bm-zoom'); if(zde) zde.textContent='z'+Math.round(cam.z*10)/10;
+  }
+
+  vp.addEventListener('mousedown',function(e){
+    if(e.button!==0) return;
+    if(e.target.closest('button')) return;
+    drag={x:e.clientX,y:e.clientY}; e.preventDefault();
+  });
+  window.addEventListener('mousemove',function(e){
+    if(drag){ pan(drag.x-e.clientX, drag.y-e.clientY); drag={x:e.clientX,y:e.clientY}; }
+  });
+  window.addEventListener('mouseup',function(){ drag=null; });
+  vp.addEventListener('wheel',function(e){
+    e.preventDefault();
+    var r=vp.getBoundingClientRect();
+    zoomAt(e.clientX-r.left,e.clientY-r.top, Math.pow(2,-e.deltaY*0.0022));
+  },{passive:false});
+  vp.addEventListener('dblclick',function(e){
+    var r=vp.getBoundingClientRect(); zoomAt(e.clientX-r.left,e.clientY-r.top,2);
+  });
+  vp.addEventListener('touchstart',function(e){
+    if(e.touches.length===1){ pd={x:e.touches[0].clientX,y:e.touches[0].clientY,d:0}; }
+    else if(e.touches.length===2){ var t1=e.touches[0],t2=e.touches[1];
+      pd={x:(t1.clientX+t2.clientX)/2,y:(t1.clientY+t2.clientY)/2,d:Math.hypot(t1.clientX-t2.clientX,t1.clientY-t2.clientY)}; }
+    e.preventDefault();
+  },{passive:false});
+  vp.addEventListener('touchmove',function(e){
+    e.preventDefault();
+    if(e.touches.length===1&&pd&&!pd.d){ pan(pd.x-e.touches[0].clientX, pd.y-e.touches[0].clientY); pd={x:e.touches[0].clientX,y:e.touches[0].clientY,d:0}; }
+    else if(e.touches.length===2&&pd&&pd.d){
+      var t1=e.touches[0],t2=e.touches[1];
+      var nx=(t1.clientX+t2.clientX)/2, ny=(t1.clientY+t2.clientY)/2;
+      var nd=Math.hypot(t1.clientX-t2.clientX,t1.clientY-t2.clientY);
+      var rr=vp.getBoundingClientRect(); zoomAt(nx-rr.left, ny-rr.top, nd/pd.d); pd.d=nd;
+    }
+  },{passive:false});
+  vp.addEventListener('touchend',function(){ pd=null; });
+
+  var zp=document.getElementById('bm-zoomin'), zm=document.getElementById('bm-zoomout'), zr=document.getElementById('bm-reset');
+  if(zp) zp.addEventListener('click',function(){ zoomAt(vpW/2,vpH/2,1.6); });
+  if(zm) zm.addEventListener('click',function(){ zoomAt(vpW/2,vpH/2,1/1.6); });
+  if(zr) zr.addEventListener('click',function(){ cam.lon=D.init.lon; cam.lat=D.init.lat; cam.z=D.init.z; drag=null; render(); });
+
+  buildMarkers(); apply('all'); resize();
+})();
+</script>

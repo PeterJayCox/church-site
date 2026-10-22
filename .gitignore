@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+
+# The vault is the source of truth; `docs/` is the generated, gated output and
+# IS committed (GitHub Pages serves main:/docs). No secret ever belongs here.
+
+# Design/example artifacts — these hold PLAINTEXT sermon notes and must never be
+# published. They contain no ciphertext payload, so the deploy gate cannot catch them.
+example-note-full.html
+example-note-v2.html
+example-note-galatians-4.md
+church-notes-password-mockup.html
+scripts/gen_full_example.py
+# One-off emitter for a single named sermon note (hardcodes its title, writes into
+# the vault); dead code now that the note exists.
+scripts/emit_transcript_note.py
