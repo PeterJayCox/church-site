@@ -3,26 +3,39 @@
 Private static site generator for the Obsidian **Church/Wiki** (sermon notes,
 Bible study, theology), rendered in the **Stained-Glass** theme.
 
-## Status — LOCAL SCAFFOLD
-- [x] Generator reads the real `Church/Wiki` markdown (36 pages)
+## Status — PUBLISHED (gated)
+- [x] Generator reads the real `Church/Wiki` markdown (58 pages)
 - [x] Stained-Glass themed output + `<meta robots=noindex>` on every page
 - [x] `robots.txt` blocks all crawlers (private site)
-- [ ] GitHub repo + Pages
-- [ ] Custom domain / subdomain DNS (Hostinger)
-- [ ] Deploy script with git push
+- [x] GitHub repo + Pages — `PeterJayCox/church-site` (PUBLIC repo, **ciphertext only**)
+- [x] Custom domain `church.peterjaycox.com` (CNAME → `peterjaycox.github.io`)
+- [x] Deploy script: `~/.hermes/scripts/church-site-deploy.sh`
 
-**The site is intentionally private.** Every page carries
-`<meta name="robots" content="noindex, nofollow">` and `robots.txt` is
-`Disallow: /`. Do not publish without keeping those in place.
+**The site is private by *encryption*, not by host.** Every content page is
+emitted as AES-256-GCM ciphertext and the browser decrypts it with the shared
+passphrase (WebCrypto), so a public repo and public host expose nothing but
+ciphertext. Keep `noindex`/`robots.txt` AND the gate in place.
+
+**Honest limits of the gate** (there is no server):
+- The ciphertext is public, so a weak passphrase is brute-forceable offline.
+- Page **titles** and the page count/section names remain readable in the
+  payload metadata and the nav.
+- One shared passphrase: no per-user identity, no revocation.
 
 ## Build
 ```bash
 ~/.hermes/hermes-agent/venv/bin/python3 build_site.py
-# output -> ./site/   (open site/index.html to preview)
+# output -> ./docs/   (open docs/index.html to preview — it needs an http origin
+#                      for WebCrypto, so prefer scripts/serve-local.sh)
 ```
 Or: `bash scripts/church-site-build.sh`
 
-Use the **hermes venv python** (system 3.9 picks up a stale `PYTHONPATH`).
+## Deploy
+```bash
+bash ~/.hermes/scripts/church-site-deploy.sh   # build -> verify gated -> push main
+```
+GitHub Pages serves `main:/docs`. It refuses to deploy without a gate
+passphrase, and aborts if any page lacks a ciphertext payload.
 
 ## How it works
 - Walks `Church/Wiki/**/*.md`, parses YAML frontmatter (`type`, `title`,
@@ -66,17 +79,21 @@ Use the **hermes venv python** (system 3.9 picks up a stale `PYTHONPATH`).
 - **Provenance markers** (`^[raw/sermons/…]`) are stripped; the raw-formatted
   (`Church/2025/…`) reference links are not resolved.
 
-## Next steps (when you're ready to publish)
-1. Pick a host: subdomain `church.peterjaycox.com` (recommended, clean + easy
-   to block), subpath `/church/`, or GitHub Pages only.
-2. `gh repo create church-notes-site --private|public` and enable Pages.
-3. Point DNS (Hostinger) / add `CNAME` (see `site/CNAME.example`).
-4. Fill in the git push block in `scripts/church-site-build.sh`.
+## Publishing notes
+- Host: GitHub Pages, repo `PeterJayCox/church-site`, source `main:/docs`,
+  custom domain `church.peterjaycox.com` (DNS CNAME → `peterjaycox.github.io`,
+  record managed at Hostinger).
+- The passphrase lives **only** at `~/.hermes/secrets/church-gate.txt` (0600).
+  Never commit it; never put it in a command line or a transcript.
+- Change it with `scripts/set-gate-password.py` (prompts, then rebuilds).
 
 ## Files
 | Path | Purpose |
 |------|---------|
 | `build_site.py` | Generator (theme + parser + renderer) |
-| `scripts/church-site-build.sh` | Local build script (staged for deploy) |
-| `site/` | Generated output (gitignore-able; rebuilt) |
-| `~/Desktop/Hermes/church-notes-rich-stainedglass.html` | Designed homepage mockup (the target look) |
+| `scripts/church-gate.js` | In-browser WebCrypto unlock |
+| `scripts/church_gate.py` | Build-time encryption (passphrase → ciphertext) |
+| `scripts/church-site-build.sh` | Local build only (no push) |
+| `scripts/serve-local.sh` | Local preview server on 127.0.0.1:8042 |
+| `~/.hermes/scripts/church-site-deploy.sh` | Build + gate check + push |
+| `docs/` | Published output (committed; regenerated each build) |

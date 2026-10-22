@@ -9,5 +9,6 @@ cd "$SITE"
 echo "[church-site] Building local static site..."
 ~/.hermes/hermes-agent/venv/bin/python3 build_site.py
 
-echo "[church-site] Done. Output in $SITE/site/ — open site/index.html to preview."
-echo "[church-site] NOTE: publishing + DNS not wired up yet (no repo push performed)."
+echo "[church-site] Done. Output in $SITE/docs/ — preview with scripts/serve-local.sh."
+echo "[church-site] NOTE: this only builds locally. To publish, run:"
+echo "[church-site]       bash ~/.hermes/scripts/church-site-deploy.sh"
