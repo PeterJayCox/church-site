@@ -7,7 +7,7 @@ SITE=~/Desktop/Hermes/"Church Site"
 cd "$SITE"
 
 echo "[church-site] Building local static site..."
-~/.hermes/hermes-agent/venv/bin/python3 build_site.py
+~/.hermes/bin/python3 build_site.py
 
 echo "[church-site] Done. Output in $SITE/docs/ — preview with scripts/serve-local.sh."
 echo "[church-site] NOTE: this only builds locally. To publish, run:"

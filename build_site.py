@@ -10,8 +10,8 @@ PASSWORD-GATED SITE: every page is emitted as ciphertext behind one shared passp
 The passphrase lives outside the repo at ~/.hermes/secrets/church-gate.txt (0600); with no
 passphrase set, every page still builds but locked with no payload (fail-closed). Pages also
 carry <meta name="robots" content="noindex,nofollow,noarchive,nosnippet"> and robots.txt
-disallows everything. Run with the hermes venv python:
-    ~/.hermes/hermes-agent/venv/bin/python3 build_site.py
+disallows everything. Run with the Hermes python (stable symlink):
+    ~/.hermes/bin/python3 build_site.py
 Set or change the passphrase with scripts/set-gate-password.py (it rebuilds afterwards).
 """
 import os, re, sys, datetime
