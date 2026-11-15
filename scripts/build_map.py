@@ -198,7 +198,22 @@ BOOKS = {
            ("Egypt / Goshen",30.60,31.90,"Where famine drove Abraham — and later Joseph (Gen 12, 41).","l")],
    exodus=[[30.96,46.10],[36.87,39.03],[35.9,36.2],[32.21,35.25],[31.93,35.22],[30.6,31.9]],
    route_label="PATRIARCHS' ROUTE"),
- }
+ "john": dict(title="John — from Galilee to Jerusalem", init=(32.30,35.40,8.0),
+   cities=[("Nazareth",32.703,35.297,"Jesus' hometown — 'can anything good come from there?' (John 1:45-46).","l"),
+           ("Cana",32.747,35.339,"The wedding and the first sign: water into wine (John 2:1-11).","r"),
+           ("Capernaum",32.880,35.575,"His Galilean base, where he went down after Cana (John 2:12).","r"),
+           ("Bethany (Jordan)",31.837,35.550,"Beyond the Jordan, where John was baptising and testified to the Lamb of God (John 1:28).","l"),
+           ("Sychar (Samaria)",32.209,35.281,"Jacob's well; the woman of Samaria, and the Father seeking worshippers (John 4).","l"),
+           ("Jerusalem",31.778,35.235,"The temple cleansed; the sign of his body raised in three days (John 2:12-25).","r")],
+   zones=[dict(lat=32.92,lon=35.92,rx=0.34,ry=0.20,label="GALILEE"),
+          dict(lat=31.52,lon=35.50,rx=0.30,ry=0.18,label="JUDEA")]),
+ "isaiah": dict(title="Isaiah — Jerusalem, Assyria and Babylon", init=(32.9,37.6,5.6),
+   cities=[("Jerusalem",31.778,35.235,"Zion — where Isaiah prophesied to Ahaz and Hezekiah.","r"),
+           ("Assyria (Nineveh)",36.359,43.152,"The empire God used as the rod of his anger (Isa 10).","l"),
+           ("Babylon",32.536,44.421,"The later empire that would carry Judah into exile (Isa 39).","l"),
+           ("Lebanon",34.050,35.950,"The cedars of Lebanon in Isaiah's oracles (Isa 2, 14).","l")],
+   zones=[dict(lat=33.2,lon=40.0,rx=4.4,ry=3.0,label="THE NATIONS")]),
+}
 
 _ALIASES = {
  "romans":["romans"], "ephesians":["ephesians"], "colossians":["colossians"],
@@ -208,7 +223,7 @@ _ALIASES = {
  "thessalonians":["thessalonians","thessalonica"], "timothy":["timothy"],
  "titus":["titus"], "philemon":["philemon"], "revelation":["revelation","revelations"],
  "mark":["mark "], "luke":["luke"], "matthew":["matthew"], "john":["john "],
- "genesis":["genesis"],
+ "genesis":["genesis"], "isaiah":["isaiah"],
 }
 def detect_book(text):
     t = (text or "").lower()
